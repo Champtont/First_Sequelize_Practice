@@ -18,10 +18,14 @@ productsRouter.get("/", async (req, res, next) => {
   try {
     const query = {};
     const name = req.query.name;
-    const price = req.query.price;
+    const priceMin = req.query.priceMin;
+    const priceMax = req.query.priceMax;
     const category = req.query.category;
     if (name) query.name = { [Op.iLike]: `${name}%` };
-    if (price) query.price = { [Op.lte]: `${price}` };
+    if (priceMin && priceMax)
+      query.price = {
+        [Op.and]: { [Op.gte]: `${priceMin}`, [Op.lte]: `${priceMax}` },
+      };
     if (category) query.category = { [Op.like]: `${category}` };
     const products = await ProductsModel.findAll({
       where: { ...query },
